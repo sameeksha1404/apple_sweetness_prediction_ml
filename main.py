@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
+import cv2
 from skimage import io, color
 
 # Load the new dataset
@@ -95,11 +96,28 @@ def extract_features(image_path, scaler):
    
     return feature_df
 
-# Specify the image path directly
-image_path = r'C:\Users\91997\Desktop\apple1.jfif'
+# Initialize the webcam
+cap = cv2.VideoCapture(0)  # Use 0 for default webcam, 1 for external webcam
 
-# Extract features from the specified image
-fruit_df = extract_features(image_path, scaler)
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+   
+    # Display the captured frame
+    cv2.imshow('frame', frame)
+   
+    # Wait for 'q' key to be pressed to take a snapshot
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Save the captured frame as an image
+        cv2.imwrite('snapshot.jpg', frame)
+        break
+
+# Release the webcam
+cap.release()
+cv2.destroyAllWindows()
+
+# Extract features from the saved image
+fruit_df = extract_features('snapshot.jpg', scaler)
 
 # Ensure the order of columns in the prediction data matches the training data
 fruit_df = fruit_df[features]
@@ -116,9 +134,11 @@ predicted_sweetness = fruit_prediction[0]
 if predicted_sweetness < -1.0:
     print("Predicted sweetness value for the fruit:", -3.5173835728462362)
 elif -1.0 <= predicted_sweetness < 3.0:
-    print("Predicted sweetness value for the fruit:", predicted_sweetness)
+    print("Predicted sweetness value for the fruit:",predicted_sweetness)
 else:
     print("Predicted sweetness value for the fruit:", 5.7274864573464653)
+
+  
 
 # Define sweetness category thresholds based on percentiles
 sweetness_percentiles = np.percentile(data['Sweetness'], [25, 75])
