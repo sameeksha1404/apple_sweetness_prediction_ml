@@ -1,0 +1,6 @@
+from sklearn.linear_model import LinearRegression
+import joblib
+
+lin_reg = LinearRegression()
+lin_reg.fit(X_train, y_train)
+joblib.dump(lin_reg, 'model/linear_regression_model.pkl')
